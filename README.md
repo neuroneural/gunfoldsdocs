@@ -1,7 +1,7 @@
 gunfolds documentation
 =======================
 
-
+This repository contains the documentation of Gunfolds
 
 Acknowledgment
 ===============
