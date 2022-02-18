@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bfutils &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="calc_process" href="calc_process_py.html" />
+    <link rel="prev" title="graphkit" href="graphkit_py.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zickle_py.html">zickle</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>bfutils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/bfutils_py.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bfutils">
+<h1>bfutils<a class="headerlink" href="#bfutils" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.is_sclique">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">is_sclique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#is_sclique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.is_sclique" title="Permalink to this definition"></a></dt>
+<dd><p>Tests if the graph is a superclique (all possible connections)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.directed_inc">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">directed_inc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#directed_inc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.directed_inc" title="Permalink to this definition"></a></dt>
+<dd><p>helper function for determining directed edges in an undersampled
+graph given a previously undersampled graph</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.bidirected_inc">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">bidirected_inc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#bidirected_inc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.bidirected_inc" title="Permalink to this definition"></a></dt>
+<dd><p>helper function for determining bidirected edges in an undersampled
+graph given a previously undersampled graph</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.increment_u">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">increment_u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#increment_u"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.increment_u" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.pure_directed_inc">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">pure_directed_inc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#pure_directed_inc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.pure_directed_inc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.increment">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.increment" title="Permalink to this definition"></a></dt>
+<dd><p>undersample G by 2
+only works for G1 to G2 directed</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.dincrement_u">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">dincrement_u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#dincrement_u"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.dincrement_u" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.undersample">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">undersample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#undersample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.undersample" title="Permalink to this definition"></a></dt>
+<dd><p>Undersample graph <cite>G</cite> by rate <cite>u</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.all_undersamples">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">all_undersamples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#all_undersamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.all_undersamples" title="Permalink to this definition"></a></dt>
+<dd><p>return a list of all undersampled graphs (excluding superclique)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.call_undersamples">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">call_undersamples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#call_undersamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.call_undersamples" title="Permalink to this definition"></a></dt>
+<dd><p>return a list of all undersampled graphs (including superclique)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.compact_call_undersamples">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">compact_call_undersamples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#compact_call_undersamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.compact_call_undersamples" title="Permalink to this definition"></a></dt>
+<dd><p>return a list of all undersampled graphs (including superclique)
+in binary encoded format</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.cc_undersamples">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">cc_undersamples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#cc_undersamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.cc_undersamples" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.forms_loop">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">forms_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#forms_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.forms_loop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.overshoot">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">overshoot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#overshoot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.overshoot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.call_u_conflicts_d">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">call_u_conflicts_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#call_u_conflicts_d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.call_u_conflicts_d" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.call_u_conflicts">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">call_u_conflicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#call_u_conflicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.call_u_conflicts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.call_u_conflicts2">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">call_u_conflicts2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#call_u_conflicts2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.call_u_conflicts2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.call_u_equals">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">call_u_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_star</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#call_u_equals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.call_u_equals" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.compatible">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">compatible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#compatible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.compatible" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.compat">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">compat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#compat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.compat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.icompat">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">icompat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#icompat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.icompat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.ilength">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">ilength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#ilength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.ilength" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.iall">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">iall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#iall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.iall" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.cc_all">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">cc_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#cc_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.cc_all" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.make_rect">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">make_rect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#make_rect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.make_rect" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.loadgraphs">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">loadgraphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#loadgraphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.loadgraphs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.dens2edgenum">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">dens2edgenum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#dens2edgenum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.dens2edgenum" title="Permalink to this definition"></a></dt>
+<dd><p>Convert density into the number of extra edges needed for a ring
+graph to achieve that density
+Arguments:
+- <cite>d</cite>: density
+- <cite>n</cite>: number of nodes in the graph</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.savegraphs">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">savegraphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#savegraphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.savegraphs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.edgenum2dens">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">edgenum2dens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#edgenum2dens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.edgenum2dens" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.check_conflict_">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">check_conflict_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Hnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">au</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#check_conflict_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.check_conflict_" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bfutils.check_equality">
+<span class="sig-prename descclassname"><span class="pre">bfutils.</span></span><span class="sig-name descname"><span class="pre">check_equality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">au</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bfutils.html#check_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bfutils.check_equality" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="graphkit_py.html" class="btn btn-neutral float-left" title="graphkit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="calc_process_py.html" class="btn btn-neutral float-right" title="calc_process" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

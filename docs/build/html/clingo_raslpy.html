@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>clingo_rasl &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="graphkit" href="graphkit_py.html" />
+    <link rel="prev" title="clingo" href="clingo_py.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clingo_py.html">clingo</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zickle_py.html">zickle</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>clingo_rasl</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/clingo_raslpy.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="clingo-rasl">
+<h1>clingo_rasl<a class="headerlink" href="#clingo-rasl" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.weighted_drasl_program">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">weighted_drasl_program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bidirected</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#weighted_drasl_program"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.weighted_drasl_program" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="clingo_rasl.all_u_rasl_program">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">all_u_rasl_program</span></span><a class="headerlink" href="#clingo_rasl.all_u_rasl_program" title="Permalink to this definition"></a></dt>
+<dd><p>alias of 
+{edge(X,Y)} :- node(X), node(Y).
+directed(X,Y,1) :- edge(X,Y).
+directed(X,Y,L) :- directed(X,Z,L-1), edge(Z,Y), L &lt;= U, u(U).
+bidirected(X,Y,U) :- directed(Z,X,L), directed(Z,Y,L), node(X;Y;Z), X &lt; Y, L &lt; U, u(U).
+countdirh(C):- C = #count { hdirected(X, Y): hdirected(X, Y), node(X), node(Y)}.
+countbidirh(C):- C = #count { hbidirected(X, Y): hbidirected(X, Y), node(X), node(Y)}.
+equald(L):- { directed(X,Y,L): hdirected(X,Y), node(X), node(Y) } == C, countdirh(C),u(L).
+equalb(L):- { bidirected(X,Y,L): hbidirected(X,Y), node(X), node(Y) } == C, countbidirh(C),u(L).
+equal(L) :- equald(L), equalb(L).
+{trueu(L)} :- equal(L).
+equaltest(M) :- 1 &lt; {equal(_)}, equal(M).
+min(M):- #min {MM:equaltest(MM)}=M, equaltest(_).
+repeat(N):- min(M), equal(N), M&lt;N.
+:- directed(X, Y, L), not hdirected(X, Y), node(X), node(Y), trueu(L).
+:- not directed(X, Y, L) , hdirected(X, Y), trueu(L).
+:- bidirected(X, Y, L), not hbidirected(X, Y), node(X), node(Y), X &lt; Y, trueu(L).
+:- not bidirected(X, Y, L), hbidirected(X, Y), X &lt; Y, trueu(L).
+:- not trueu(_).
+:- min(M), trueu(N), M&lt;N.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="clingo_rasl.drasl_program">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">drasl_program</span></span><a class="headerlink" href="#clingo_rasl.drasl_program" title="Permalink to this definition"></a></dt>
+<dd><p>alias of 
+    {edge1(X,Y)} :- node(X), node(Y).
+    directed(X, Y, 1) :- edge1(X, Y).
+    directed(X, Y, L) :- directed(X, Z, L-1), edge1(Z, Y), L &lt;= U, u(U, _).
+    bidirected(X, Y, U) :- directed(Z, X, L), directed(Z, Y, L), node(X;Y;Z), X &lt; Y, L &lt; U, u(U, _).
+
+    :- directed(X, Y, L), not hdirected(X, Y, K), node(X;Y), u(L, K).
+    :- bidirected(X, Y, L), not hbidirected(X, Y, K), node(X;Y), u(L, K), X &lt; Y.
+    :- not directed(X, Y, L), hdirected(X, Y, K), node(X;Y), u(L, K).
+    :- not bidirected(X, Y, L), hbidirected(X, Y, K), node(X;Y), u(L, K), X &lt; Y.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.rate">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.rate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.drate">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">drate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnum</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#drate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.drate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.rasl_command">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">rasl_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#rasl_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.rasl_command" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.glist2str">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">glist2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bdm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#glist2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.glist2str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.drasl_command">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">drasl_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_urate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bdm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#drasl_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.drasl_command" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.drasl">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">drasl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">glist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bdm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#drasl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.drasl" title="Permalink to this definition"></a></dt>
+<dd><p>Compute all candidate causal time-scale graphs that could have
+generated all undersampled graphs at all possible undersampling
+rates up to <cite>urate</cite> in <cite>glist</cite> each at an unknown undersampling
+rate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>glist</strong> (list of dictionaries (<cite>gunfolds</cite> graphs)) – a list of graphs that are undersampled versions of
+the same system</p></li>
+<li><p><strong>capsize</strong> (<em>integer</em>) – maximum number of candidates to return</p></li>
+<li><p><strong>timeout</strong> (<em>integer</em>) – timeout in seconds after which to interrupt
+computation (0 - no limit)</p></li>
+<li><p><strong>urate</strong> (<em>integer</em>) – maximum undersampling rate to consider</p></li>
+<li><p><strong>weighted</strong> (<em>boolean</em>) – whether the input graphs are weighted or
+imprecize.  If <cite>True</cite> but no weight matrices are provided -
+all weights are set to <cite>1</cite></p></li>
+<li><p><strong>scc</strong> (<em>boolean</em>) – whether to assume that each SCC in the input graph is
+either a singleton or have <cite>gcd=1</cite>.  If <cite>True</cite> a much more
+efficient algorithm is employed.</p></li>
+<li><p><strong>dm</strong> (<em>list of numpy arrays</em>) – a list of n-by-n 2-d square matrix of the weights for
+directed edges of each input n-node graph</p></li>
+<li><p><strong>bdm</strong> (<em>list of numpy arrays</em>) – a list of <em>symmetric</em> n-by-n 2-d square matrix of the
+weights for bidirected edges of each input n-node graph</p></li>
+<li><p><strong>edge_weights</strong> (<em>tuple with 2 elements</em>) – a tuple of 2 values, the first is importance of matching directed weights when solving optimization problem and the second is for bidirected.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clingo_rasl.rasl">
+<span class="sig-prename descclassname"><span class="pre">clingo_rasl.</span></span><span class="sig-name descname"><span class="pre">rasl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/clingo_rasl.html#rasl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#clingo_rasl.rasl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="clingo_py.html" class="btn btn-neutral float-left" title="clingo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="graphkit_py.html" class="btn btn-neutral float-right" title="graphkit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
