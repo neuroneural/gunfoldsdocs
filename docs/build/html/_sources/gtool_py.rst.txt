@@ -1,0 +1,1 @@
+gtool========.. autofunction:: gtool.lg2gt.. autofunction:: gtool.gt2g.. autofunction:: gtool.plotg
