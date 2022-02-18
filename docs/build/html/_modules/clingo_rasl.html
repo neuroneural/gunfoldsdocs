@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>clingo_rasl &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zickle_py.html">zickle</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>clingo_rasl</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for clingo_rasl</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This module contains clingo interaction functions &quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">clingo</span> <span class="kn">import</span> <span class="n">clingo</span>
+<span class="kn">from</span> <span class="nn">conversions</span> <span class="kn">import</span> <span class="n">g2clingo</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">rasl_jclingo2g</span><span class="p">,</span>\
+     <span class="n">drasl_jclingo2g</span><span class="p">,</span> <span class="n">msl_jclingo2g</span><span class="p">,</span> <span class="n">clingo_preamble</span><span class="p">,</span>\
+     <span class="n">numbered_g2clingo</span><span class="p">,</span> <span class="n">numbered_g2wclingo</span><span class="p">,</span> <span class="n">encode_sccs</span>
+
+<span class="n">all_u_rasl_program</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">{edge(X,Y)} :- node(X), node(Y).</span>
+<span class="s2">directed(X,Y,1) :- edge(X,Y).</span>
+<span class="s2">directed(X,Y,L) :- directed(X,Z,L-1), edge(Z,Y), L &lt;= U, u(U).</span>
+<span class="s2">bidirected(X,Y,U) :- directed(Z,X,L), directed(Z,Y,L), node(X;Y;Z), X &lt; Y, L &lt; U, u(U).</span>
+<span class="s2">countdirh(C):- C = #count { hdirected(X, Y): hdirected(X, Y), node(X), node(Y)}.</span>
+<span class="s2">countbidirh(C):- C = #count { hbidirected(X, Y): hbidirected(X, Y), node(X), node(Y)}.</span>
+<span class="s2">equald(L):- { directed(X,Y,L): hdirected(X,Y), node(X), node(Y) } == C, countdirh(C),u(L).</span>
+<span class="s2">equalb(L):- { bidirected(X,Y,L): hbidirected(X,Y), node(X), node(Y) } == C, countbidirh(C),u(L).</span>
+<span class="s2">equal(L) :- equald(L), equalb(L).</span>
+<span class="s2">{trueu(L)} :- equal(L).</span>
+<span class="s2">equaltest(M) :- 1 &lt; {equal(_)}, equal(M).</span>
+<span class="s2">min(M):- #min {MM:equaltest(MM)}=M, equaltest(_).</span>
+<span class="s2">repeat(N):- min(M), equal(N), M&lt;N.</span>
+<span class="s2">:- directed(X, Y, L), not hdirected(X, Y), node(X), node(Y), trueu(L).</span>
+<span class="s2">:- not directed(X, Y, L) , hdirected(X, Y), trueu(L).</span>
+<span class="s2">:- bidirected(X, Y, L), not hbidirected(X, Y), node(X), node(Y), X &lt; Y, trueu(L).</span>
+<span class="s2">:- not bidirected(X, Y, L), hbidirected(X, Y), X &lt; Y, trueu(L).</span>
+<span class="s2">:- not trueu(_).</span>
+<span class="s2">:- min(M), trueu(N), M&lt;N.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+<span class="n">drasl_program</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    {edge1(X,Y)} :- node(X), node(Y).</span>
+<span class="s2">    directed(X, Y, 1) :- edge1(X, Y).</span>
+<span class="s2">    directed(X, Y, L) :- directed(X, Z, L-1), edge1(Z, Y), L &lt;= U, u(U, _).</span>
+<span class="s2">    bidirected(X, Y, U) :- directed(Z, X, L), directed(Z, Y, L), node(X;Y;Z), X &lt; Y, L &lt; U, u(U, _).</span>
+
+<span class="s2">    :- directed(X, Y, L), not hdirected(X, Y, K), node(X;Y), u(L, K).</span>
+<span class="s2">    :- bidirected(X, Y, L), not hbidirected(X, Y, K), node(X;Y), u(L, K), X &lt; Y.</span>
+<span class="s2">    :- not directed(X, Y, L), hdirected(X, Y, K), node(X;Y), u(L, K).</span>
+<span class="s2">    :- not bidirected(X, Y, L), hbidirected(X, Y, K), node(X;Y), u(L, K), X &lt; Y.</span>
+
+<span class="s2">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="weighted_drasl_program"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.weighted_drasl_program">[docs]</a><span class="k">def</span> <span class="nf">weighted_drasl_program</span><span class="p">(</span><span class="n">directed</span><span class="p">,</span> <span class="n">bidirected</span><span class="p">):</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    {edge1(X,Y)} :- node(X), node(Y).</span>
+<span class="s2">    directed(X, Y, 1) :- edge1(X, Y).</span>
+<span class="s2">    directed(X, Y, L) :- directed(X, Z, L-1), edge1(Z, Y), L &lt;= U, u(U, _).</span>
+<span class="s2">    bidirected(X, Y, U) :- directed(Z, X, L), directed(Z, Y, L), node(X;Y;Z), X &lt; Y, L &lt; U, u(U, _).</span>
+
+<span class="s2">    :~ not directed(X, Y, L), hdirected(X, Y, W, K), node(X;Y), u(L, K). [W@$directed,X,Y]</span>
+<span class="s2">    :~ not bidirected(X, Y, L), hbidirected(X, Y, W, K), node(X;Y), u(L, K), X &lt; Y. [W@$bidirected,X,Y]</span>
+<span class="s2">    :~ directed(X, Y, L), no_hdirected(X, Y, W, K), node(X;Y), u(L, K). [W@$directed,X,Y]</span>
+<span class="s2">    :~ bidirected(X, Y, L), no_hbidirected(X, Y, W, K), node(X;Y), u(L, K), X &lt; Y. [W@$bidirected,X,Y]</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">bidirected</span><span class="o">=</span><span class="n">bidirected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rate"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.rate">[docs]</a><span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">uname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;1 {&quot;</span> <span class="o">+</span> <span class="n">uname</span> <span class="o">+</span> <span class="s2">&quot;(1..&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;)} 1.&quot;</span>
+    <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="drate"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.drate">[docs]</a><span class="k">def</span> <span class="nf">drate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">gnum</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;1 </span><span class="se">{{</span><span class="s2">u(1..</span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">gnum</span><span class="si">}</span><span class="s2">)</span><span class="se">}}</span><span class="s2"> 1.&quot;</span>
+    <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="rasl_command"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.rasl_command">[docs]</a><span class="k">def</span> <span class="nf">rasl_command</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">urate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">all_u</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">urate</span><span class="p">:</span> <span class="n">urate</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">g2clingo</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">rate</span><span class="p">(</span><span class="n">urate</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39;{edge(X,Y)} :- node(X), node(Y). &#39;</span> <span class="o">+</span> <span class="n">all_u_rasl_program</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s2">&quot;#show edge/2. &quot;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s2">&quot;#show trueu/1. &quot;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s2">&quot;#show min/1.&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">command</span></div>
+
+<div class="viewcode-block" id="glist2str"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.glist2str">[docs]</a><span class="k">def</span> <span class="nf">glist2str</span><span class="p">(</span><span class="n">g_list</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bdm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">g_list</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bdm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bdm</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">g_list</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">g_list</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">bdm</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">numbered_g2wclingo</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">directed_weights_matrix</span><span class="o">=</span><span class="n">D</span><span class="p">,</span> <span class="n">bidirected_weights_matrix</span><span class="o">=</span><span class="n">B</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span>  <span class="n">numbered_g2clingo</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+    <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="drasl_command"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.drasl_command">[docs]</a><span class="k">def</span> <span class="nf">drasl_command</span><span class="p">(</span><span class="n">g_list</span><span class="p">,</span> <span class="n">max_urate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bdm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_weights</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">({</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">g_list</span><span class="p">})</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Input graphs have variable number of nodes!&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">max_urate</span><span class="p">:</span> <span class="n">max_urate</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">g_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g_list</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">clingo_preamble</span><span class="p">(</span><span class="n">g_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">scc</span><span class="p">:</span> <span class="n">command</span> <span class="o">+=</span> <span class="n">encode_sccs</span><span class="p">(</span><span class="n">g_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;dagl(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">g_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">). &quot;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="n">glist2str</span><span class="p">(</span><span class="n">g_list</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="n">weighted</span><span class="p">,</span> <span class="n">dm</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">bdm</span><span class="o">=</span><span class="n">bdm</span><span class="p">)</span><span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="c1"># generate all graphs</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">drate</span><span class="p">(</span><span class="n">max_urate</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="n">weighted_drasl_program</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge_weights</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">weighted</span> <span class="k">else</span> <span class="n">drasl_program</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;:- M = N, </span><span class="se">{{</span><span class="s2">u(M, 1..</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">); u(N, 1..</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">)</span><span class="se">}}</span><span class="s2"> == 2, u(M, _), u(N, _). &quot;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s2">&quot;#show edge1/2. &quot;</span>
+    <span class="n">command</span> <span class="o">+=</span> <span class="s2">&quot;#show u/2.&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">command</span></div>
+
+<div class="viewcode-block" id="drasl"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.drasl">[docs]</a><span class="k">def</span> <span class="nf">drasl</span><span class="p">(</span><span class="n">glist</span><span class="p">,</span> <span class="n">capsize</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">urate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">dm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bdm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_weights</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute all candidate causal time-scale graphs that could have</span>
+<span class="sd">    generated all undersampled graphs at all possible undersampling</span>
+<span class="sd">    rates up to `urate` in `glist` each at an unknown undersampling</span>
+<span class="sd">    rate.</span>
+
+<span class="sd">    :parameter glist: a list of graphs that are undersampled versions of</span>
+<span class="sd">        the same system</span>
+<span class="sd">    :type glist: list of dictionaries (`gunfolds` graphs)</span>
+
+<span class="sd">    :parameter capsize: maximum number of candidates to return</span>
+<span class="sd">    :type capsize: integer</span>
+
+<span class="sd">    :parameter timeout: timeout in seconds after which to interrupt</span>
+<span class="sd">        computation (0 - no limit)</span>
+<span class="sd">    :type timeout: integer</span>
+
+<span class="sd">    :parameter urate: maximum undersampling rate to consider</span>
+<span class="sd">    :type urate: integer</span>
+
+<span class="sd">    :parameter weighted: whether the input graphs are weighted or</span>
+<span class="sd">        imprecize.  If `True` but no weight matrices are provided -</span>
+<span class="sd">        all weights are set to `1`</span>
+<span class="sd">    :type weighted: boolean</span>
+
+<span class="sd">    :parameter scc: whether to assume that each SCC in the input graph is</span>
+<span class="sd">        either a singleton or have `gcd=1`.  If `True` a much more</span>
+<span class="sd">        efficient algorithm is employed.</span>
+<span class="sd">    :type scc: boolean</span>
+
+<span class="sd">    :parameter dm: a list of n-by-n 2-d square matrix of the weights for</span>
+<span class="sd">        directed edges of each input n-node graph</span>
+<span class="sd">    :type dm: list of numpy arrays</span>
+
+<span class="sd">    :parameter bdm: a list of *symmetric* n-by-n 2-d square matrix of the</span>
+<span class="sd">        weights for bidirected edges of each input n-node graph</span>
+<span class="sd">    :type bdm: list of numpy arrays</span>
+
+<span class="sd">    :parameter edge_weights: a tuple of 2 values, the first is importance of matching directed weights when solving optimization problem and the second is for bidirected.</span>
+<span class="sd">    </span>
+<span class="sd">    :type edge_weights: tuple with 2 elements</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">glist</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">glist</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">clingo</span><span class="p">(</span><span class="n">drasl_command</span><span class="p">(</span><span class="n">glist</span><span class="p">,</span> <span class="n">max_urate</span><span class="o">=</span><span class="n">urate</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="n">weighted</span><span class="p">,</span>
+                                <span class="n">scc</span><span class="o">=</span><span class="n">scc</span><span class="p">,</span> <span class="n">dm</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">bdm</span><span class="o">=</span><span class="n">bdm</span><span class="p">,</span> <span class="n">edge_weights</span><span class="o">=</span><span class="n">edge_weights</span><span class="p">),</span>
+                  <span class="n">capsize</span><span class="o">=</span><span class="n">capsize</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="n">drasl_jclingo2g</span><span class="p">,</span>
+                  <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="ow">not</span> <span class="n">weighted</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="n">pnum</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rasl"><a class="viewcode-back" href="../clingo_raslpy.html#clingo_rasl.rasl">[docs]</a><span class="k">def</span> <span class="nf">rasl</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">capsize</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">urate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">clingo</span><span class="p">(</span><span class="n">rasl_command</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">urate</span><span class="o">=</span><span class="n">urate</span><span class="p">),</span> <span class="n">capsize</span><span class="o">=</span><span class="n">capsize</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="n">rasl_jclingo2g</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="n">pnum</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
