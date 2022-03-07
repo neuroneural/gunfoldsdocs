@@ -1,0 +1,10 @@
+README.rst
+setup.cfg
+setup.py
+Pytess.egg-info/PKG-INFO
+Pytess.egg-info/SOURCES.txt
+Pytess.egg-info/dependency_links.txt
+Pytess.egg-info/top_level.txt
+pytess/__init__.py
+pytess/main.py
+pytess/tesselator.py

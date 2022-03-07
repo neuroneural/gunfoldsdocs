@@ -1,0 +1,25 @@
+Metadata-Version: 1.1
+Name: sarge
+Version: 0.1.7.post1
+Summary: A wrapper for subprocess which provides command pipeline functionality.
+Home-page: https://docs.red-dove.com/sarge/
+Author: Vinay Sajip
+Author-email: vinay_sajip@red-dove.com
+License: Copyright (C) 2008-2021 by Vinay Sajip. All Rights Reserved. See LICENSE for license.
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Download-URL: https://github.com/vsajip/sarge/releases/download/0.1.7.post1/sarge-0.1.7.post1.tar.gz

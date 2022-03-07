@@ -1,0 +1,1 @@
+grangercausality===================.. autofunction:: grangercausality.gc

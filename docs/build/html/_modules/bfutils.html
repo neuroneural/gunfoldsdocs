@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bfutils &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zickle_py.html">zickle</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>bfutils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for bfutils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">conversions</span> <span class="kn">import</span> <span class="n">g2num</span><span class="p">,</span> <span class="n">ug2num</span><span class="p">,</span> <span class="n">num2CG</span>
+<span class="kn">import</span> <span class="nn">zickle</span> <span class="k">as</span> <span class="nn">zkl</span>
+<span class="kn">import</span> <span class="nn">graphkit</span> <span class="k">as</span> <span class="nn">gk</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+
+<span class="c1">#### Undersampling functions</span>
+
+<div class="viewcode-block" id="is_sclique"><a class="viewcode-back" href="../bfutils_py.html#bfutils.is_sclique">[docs]</a><span class="k">def</span> <span class="nf">is_sclique</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Tests if the graph is a superclique (all possible connections) &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">row_sum</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># rows will have all connections plus a self loop</span>
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">G</span><span class="p">[</span><span class="n">vertex</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">sum</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">vertex</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">!=</span> <span class="n">row_sum</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="directed_inc"><a class="viewcode-back" href="../bfutils_py.html#bfutils.directed_inc">[docs]</a><span class="k">def</span> <span class="nf">directed_inc</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; helper function for determining directed edges in an undersampled</span>
+<span class="sd">        graph given a previously undersampled graph &quot;&quot;&quot;</span>
+    <span class="n">G_un</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># directed edges</span>
+    <span class="k">for</span> <span class="n">vert1</span> <span class="ow">in</span> <span class="n">D</span><span class="p">:</span>
+        <span class="n">G_un</span><span class="p">[</span><span class="n">vert1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vert2</span> <span class="ow">in</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">G</span><span class="p">[</span><span class="n">vert2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">vert2</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">vert2</span><span class="p">]:</span>
+                    <span class="n">G_un</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">G_un</span></div>
+
+
+<div class="viewcode-block" id="bidirected_inc"><a class="viewcode-back" href="../bfutils_py.html#bfutils.bidirected_inc">[docs]</a><span class="k">def</span> <span class="nf">bidirected_inc</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; helper function for determining bidirected edges in an undersampled</span>
+<span class="sd">        graph given a previously undersampled graph &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">vert1</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="c1"># transfer old bidirected edges</span>
+        <span class="k">for</span> <span class="n">vert2</span> <span class="ow">in</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">vert2</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="n">G</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">vert2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">G</span><span class="p">[</span><span class="n">vert1</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vert2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">3</span>
+        <span class="c1"># new bidirected edges</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">]</span> <span class="k">if</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">G</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">G</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">3</span>
+    <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="increment_u"><a class="viewcode-back" href="../bfutils_py.html#bfutils.increment_u">[docs]</a><span class="k">def</span> <span class="nf">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">G_u</span><span class="p">):</span>
+    <span class="c1"># directed edges</span>
+    <span class="n">G_un</span> <span class="o">=</span> <span class="n">directed_inc</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">G_u</span><span class="p">)</span>
+    <span class="c1"># bidirected edges</span>
+    <span class="n">G_un</span> <span class="o">=</span> <span class="n">bidirected_inc</span><span class="p">(</span><span class="n">G_un</span><span class="p">,</span> <span class="n">G_u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G_un</span></div>
+
+
+<div class="viewcode-block" id="pure_directed_inc"><a class="viewcode-back" href="../bfutils_py.html#bfutils.pure_directed_inc">[docs]</a><span class="k">def</span> <span class="nf">pure_directed_inc</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
+    <span class="n">G_un</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># directed edges</span>
+    <span class="k">for</span> <span class="n">vert1</span> <span class="ow">in</span> <span class="n">D</span><span class="p">:</span>
+        <span class="n">G_un</span><span class="p">[</span><span class="n">vert1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">prev_vert</span> <span class="ow">in</span> <span class="n">D</span><span class="p">[</span><span class="n">vert1</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">vert2</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">prev_vert</span><span class="p">]:</span>
+                <span class="n">G_un</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">vert2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">G_un</span></div>
+
+
+<div class="viewcode-block" id="increment"><a class="viewcode-back" href="../bfutils_py.html#bfutils.increment">[docs]</a><span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    undersample G by 2</span>
+<span class="sd">    only works for G1 to G2 directed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">G2</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">vert1</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">vert1</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">h</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">G2</span><span class="p">[</span><span class="n">vert1</span><span class="p">]:</span>
+                    <span class="n">G2</span><span class="p">[</span><span class="n">vert1</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">vert1</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">vert1</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">|=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
+                <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">|=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">G2</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">G2</span></div>
+
+
+<div class="viewcode-block" id="dincrement_u"><a class="viewcode-back" href="../bfutils_py.html#bfutils.dincrement_u">[docs]</a><span class="k">def</span> <span class="nf">dincrement_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">G_u</span><span class="p">):</span>
+    <span class="c1"># directed edges</span>
+    <span class="n">G_un</span> <span class="o">=</span> <span class="n">pure_directed_inc</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">G_u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G_un</span></div>
+
+
+<div class="viewcode-block" id="undersample"><a class="viewcode-back" href="../bfutils_py.html#bfutils.undersample">[docs]</a><span class="k">def</span> <span class="nf">undersample</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Undersample graph `G` by rate `u`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">G</span>
+    <span class="n">Gu</span> <span class="o">=</span> <span class="n">G</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">u</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">Gu</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">Gu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Gu</span></div>
+
+
+<div class="viewcode-block" id="all_undersamples"><a class="viewcode-back" href="../bfutils_py.html#bfutils.all_undersamples">[docs]</a><span class="k">def</span> <span class="nf">all_undersamples</span><span class="p">(</span><span class="n">G_star</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; return a list of all undersampled graphs (excluding superclique) &quot;&quot;&quot;</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">is_sclique</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">glist</span>  <span class="c1"># superclique convergence</span>
+        <span class="c1"># this will (may be) capture DAGs and oscillations</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">glist</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">glist</span></div>
+
+
+<div class="viewcode-block" id="call_undersamples"><a class="viewcode-back" href="../bfutils_py.html#bfutils.call_undersamples">[docs]</a><span class="k">def</span> <span class="nf">call_undersamples</span><span class="p">(</span><span class="n">G_star</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; return a list of all undersampled graphs (including superclique) &quot;&quot;&quot;</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">glist</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">glist</span></div>
+
+
+<div class="viewcode-block" id="compact_call_undersamples"><a class="viewcode-back" href="../bfutils_py.html#bfutils.compact_call_undersamples">[docs]</a><span class="k">def</span> <span class="nf">compact_call_undersamples</span><span class="p">(</span><span class="n">G_star</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; return a list of all undersampled graphs (including superclique)</span>
+<span class="sd">        in binary encoded format &quot;&quot;&quot;</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ug2num</span><span class="p">(</span><span class="n">G_star</span><span class="p">)]</span>
+    <span class="n">lastgraph</span> <span class="o">=</span> <span class="n">G_star</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">lastgraph</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">ug2num</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">glist</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">lastgraph</span> <span class="o">=</span> <span class="n">g</span>
+    <span class="k">return</span> <span class="n">glist</span></div>
+
+
+<div class="viewcode-block" id="cc_undersamples"><a class="viewcode-back" href="../bfutils_py.html#bfutils.cc_undersamples">[docs]</a><span class="k">def</span> <span class="nf">cc_undersamples</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ug2num</span><span class="p">(</span><span class="n">G_star</span><span class="p">)]</span>
+    <span class="n">lastgraph</span> <span class="o">=</span> <span class="n">G_star</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">lastgraph</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">ug2num</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">lastgraph</span> <span class="o">=</span> <span class="n">g</span>
+    <span class="k">return</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<span class="c1">#### Misc graph functions</span>
+
+<div class="viewcode-block" id="overshoot"><a class="viewcode-back" href="../bfutils_py.html#bfutils.overshoot">[docs]</a><span class="k">def</span> <span class="nf">overshoot</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">is_sclique</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">gk</span><span class="o">.</span><span class="n">isedgesubset</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="forms_loop"><a class="viewcode-back" href="../bfutils_py.html#bfutils.forms_loop">[docs]</a><span class="k">def</span> <span class="nf">forms_loop</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">loop</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">g2num</span><span class="p">(</span><span class="n">gk</span><span class="o">.</span><span class="n">digonly</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">loop</span><span class="p">)</span> <span class="o">==</span> <span class="n">loop</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="call_u_conflicts_d"><a class="viewcode-back" href="../bfutils_py.html#bfutils.call_u_conflicts_d">[docs]</a><span class="k">def</span> <span class="nf">call_u_conflicts_d</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">checkrate</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">dincrement_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">gk</span><span class="o">.</span><span class="n">isedgesubset</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="call_u_conflicts"><a class="viewcode-back" href="../bfutils_py.html#bfutils.call_u_conflicts">[docs]</a><span class="k">def</span> <span class="nf">call_u_conflicts</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">checkrate</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># g = increment_u(G_star, glist[-1])</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">directed_inc</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">gk</span><span class="o">.</span><span class="n">isdedgesubset</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">bidirected_inc</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">gk</span><span class="o">.</span><span class="n">isedgesubset</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="call_u_conflicts2"><a class="viewcode-back" href="../bfutils_py.html#bfutils.call_u_conflicts2">[docs]</a><span class="k">def</span> <span class="nf">call_u_conflicts2</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">gk</span><span class="o">.</span><span class="n">isedgesubset</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">glist</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">glist</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">glist</span></div>
+
+
+<span class="k">def</span> <span class="nf">call_u_equals2</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="n">H</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="call_u_equals"><a class="viewcode-back" href="../bfutils_py.html#bfutils.call_u_equals">[docs]</a><span class="k">def</span> <span class="nf">call_u_equals</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="n">glist</span> <span class="o">=</span> <span class="p">[</span><span class="n">G_star</span><span class="p">]</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">increment_u</span><span class="p">(</span><span class="n">G_star</span><span class="p">,</span> <span class="n">glist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="n">H</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">glist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="compatible"><a class="viewcode-back" href="../bfutils_py.html#bfutils.compatible">[docs]</a><span class="k">def</span> <span class="nf">compatible</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">r</span> <span class="o">==</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d2</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">d1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">idx</span></div>
+
+
+<div class="viewcode-block" id="compat"><a class="viewcode-back" href="../bfutils_py.html#bfutils.compat">[docs]</a><span class="k">def</span> <span class="nf">compat</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">g2num</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="c1"># sample all the graph for gStar</span>
+    <span class="n">star_l</span> <span class="o">=</span> <span class="n">all_undersamples</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">hits</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># brute force all graphs</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)):</span>
+        <span class="n">tmpG</span> <span class="o">=</span> <span class="n">num2CG</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">tmp_l</span> <span class="o">=</span> <span class="n">all_undersamples</span><span class="p">(</span><span class="n">tmpG</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">compatible</span><span class="p">(</span><span class="n">tmp_l</span><span class="p">,</span> <span class="n">star_l</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">hits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">hits</span></div>
+
+
+<div class="viewcode-block" id="icompat"><a class="viewcode-back" href="../bfutils_py.html#bfutils.icompat">[docs]</a><span class="k">def</span> <span class="nf">icompat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">num2CG</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compat</span><span class="p">(</span><span class="n">g</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ilength"><a class="viewcode-back" href="../bfutils_py.html#bfutils.ilength">[docs]</a><span class="k">def</span> <span class="nf">ilength</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">num2CG</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">call_undersamples</span><span class="p">(</span><span class="n">g</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="iall"><a class="viewcode-back" href="../bfutils_py.html#bfutils.iall">[docs]</a><span class="k">def</span> <span class="nf">iall</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">num2CG</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compact_call_undersamples</span><span class="p">(</span><span class="n">g</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cc_all"><a class="viewcode-back" href="../bfutils_py.html#bfutils.cc_all">[docs]</a><span class="k">def</span> <span class="nf">cc_all</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">num2CG</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cc_undersamples</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_rect"><a class="viewcode-back" href="../bfutils_py.html#bfutils.make_rect">[docs]</a><span class="k">def</span> <span class="nf">make_rect</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="n">max_seq</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+    <span class="n">nl</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">+=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_seq</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nl</span></div>
+
+
+<div class="viewcode-block" id="loadgraphs"><a class="viewcode-back" href="../bfutils_py.html#bfutils.loadgraphs">[docs]</a><span class="k">def</span> <span class="nf">loadgraphs</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">zkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="savegraphs"><a class="viewcode-back" href="../bfutils_py.html#bfutils.savegraphs">[docs]</a><span class="k">def</span> <span class="nf">savegraphs</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="n">zkl</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span></div>
+
+
+<span class="c1"># talking about extra edges on top of the ring</span>
+    
+
+<div class="viewcode-block" id="dens2edgenum"><a class="viewcode-back" href="../bfutils_py.html#bfutils.dens2edgenum">[docs]</a><span class="k">def</span> <span class="nf">dens2edgenum</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert density into the number of extra edges needed for a ring</span>
+<span class="sd">    graph to achieve that density</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">    - `d`: density</span>
+<span class="sd">    - `n`: number of nodes in the graph</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="edgenum2dens"><a class="viewcode-back" href="../bfutils_py.html#bfutils.edgenum2dens">[docs]</a><span class="k">def</span> <span class="nf">edgenum2dens</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">e</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">/</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span></div>
+
+
+<span class="k">def</span> <span class="nf">check_conflict</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">G_test</span><span class="p">,</span> <span class="n">au</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">au</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">call_undersamples</span><span class="p">(</span><span class="n">G_test</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">au</span>
+    <span class="k">for</span> <span class="n">graph</span> <span class="ow">in</span> <span class="n">allundersamples</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">isedgesubset</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="check_conflict_"><a class="viewcode-back" href="../bfutils_py.html#bfutils.check_conflict_">[docs]</a><span class="k">def</span> <span class="nf">check_conflict_</span><span class="p">(</span><span class="n">Hnum</span><span class="p">,</span> <span class="n">G_test</span><span class="p">,</span> <span class="n">au</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">au</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">call_undersamples</span><span class="p">(</span><span class="n">G_test</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">au</span>
+    <span class="c1"># Hnum = ug2num(H)</span>
+    <span class="k">for</span> <span class="n">graph</span> <span class="ow">in</span> <span class="n">allundersamples</span><span class="p">:</span>
+        <span class="n">gnum</span> <span class="o">=</span> <span class="n">ug2num</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gnum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Hnum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">gnum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">gnum</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Hnum</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">gnum</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="check_equality"><a class="viewcode-back" href="../bfutils_py.html#bfutils.check_equality">[docs]</a><span class="k">def</span> <span class="nf">check_equality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">G_test</span><span class="p">,</span> <span class="n">au</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">au</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">call_undersamples</span><span class="p">(</span><span class="n">G_test</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">allundersamples</span> <span class="o">=</span> <span class="n">au</span>
+    <span class="k">for</span> <span class="n">graph</span> <span class="ow">in</span> <span class="n">allundersamples</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">graph</span> <span class="o">==</span> <span class="n">H</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

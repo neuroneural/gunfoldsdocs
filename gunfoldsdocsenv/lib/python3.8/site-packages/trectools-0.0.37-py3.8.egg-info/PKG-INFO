@@ -1,0 +1,27 @@
+Metadata-Version: 1.0
+Name: trectools
+Version: 0.0.37
+Summary: Python toolkit to read and analyse TREC results.
+Home-page: https://github.com/joaopalotti/trec_tools
+Author: Joao Palotti
+Author-email: joaopalotti@gmail.com
+License: BSD
+Description: ======================
+        TREC TOOLS
+        ======================
+        
+        A simple toolkit to process TREC files.
+        
+        Usage
+        -----
+        
+            #!/usr/bin/env python
+            
+            from trectools import trec_run
+        
+            tr = trec_run()
+        
+            print tr.read_run("participant.run")
+        
+        
+Platform: UNKNOWN

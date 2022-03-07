@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>graphkit &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>graphkit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for graphkit</h1><div class="highlight"><pre>
+<span></span><span class="c1"># tools to construct (random) graphs</span>
+<span class="kn">from</span> <span class="nn">conversions</span> <span class="kn">import</span> <span class="n">nx2graph</span><span class="p">,</span> <span class="n">nxbp2graph</span><span class="p">,</span> <span class="n">graph2adj</span><span class="p">,</span> <span class="n">graph2nx</span>
+<span class="c1">#from gunfolds.tools import ecj</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">networkx.utils.random_sequence</span> <span class="kn">import</span> <span class="n">powerlaw_sequence</span>
+<span class="kn">from</span> <span class="nn">networkx.algorithms.dag</span> <span class="kn">import</span> <span class="n">topological_sort</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">randint</span>
+
+<div class="viewcode-block" id="edgelist"><a class="viewcode-back" href="../graphkit_py.html#graphkit.edgelist">[docs]</a><span class="k">def</span> <span class="nf">edgelist</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>  <span class="c1"># directed</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    return a list of tuples for edges of g</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">l</span></div>
+
+
+<span class="k">def</span> <span class="nf">inedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>  <span class="c1"># missing directed iterator</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    iterate over the list of tuples for edges of g</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">inbedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>  <span class="c1"># missing bidirected iterator</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    iterate over the list of tuples for edges of g</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="n">w</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">bedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; bidirected edge list with flips &quot;&quot;&quot;</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">e</span><span class="p">)))</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">e</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">l</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">l</span>
+
+
+<span class="k">def</span> <span class="nf">superclique</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; All possible edges &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">i</span><span class="p">}</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; return the complement of G &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">sq</span> <span class="o">=</span> <span class="n">superclique</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+            <span class="n">sq</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">sq</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="o">-</span> <span class="n">G</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sq</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">sq</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sq</span>
+
+
+<span class="k">def</span> <span class="nf">gtranspose</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transpose (rev. edges of) G &quot;&quot;&quot;</span>
+    <span class="n">GT</span> <span class="o">=</span> <span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">G</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">u</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">G</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">GT</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>        <span class="c1"># Add all reverse edges</span>
+    <span class="k">return</span> <span class="n">GT</span>
+
+
+<span class="k">def</span> <span class="nf">scale_free</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+               <span class="n">delta_in</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">delta_out</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">scale_free_graph</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                            <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+                            <span class="n">delta_in</span><span class="o">=</span><span class="n">delta_in</span><span class="p">,</span> <span class="n">delta_out</span><span class="o">=</span><span class="n">delta_out</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx2graph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">gtranspose</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">addAring</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">randH</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate a random H with n nodes &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">ringmore</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">pairs</span><span class="p">)[:</span><span class="n">d2</span><span class="p">]:</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">ring</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">addAring</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add a ring to g in place&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">upairs</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;n unique nonsequential pairs</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">randint</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">)[:</span><span class="n">k</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">ringarcs</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">upairs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">ringmore</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ringarcs</span><span class="p">(</span><span class="n">ring</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">m</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">digonly</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;returns a subgraph of H contatining all directed edges of H</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - `H`: undersampled graph</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">H</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">H</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">H</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">_OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    omission/commision error of g1 referenced to g2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">g1</span><span class="p">))</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">g2</span><span class="p">))</span>
+    <span class="n">omitted</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s2</span> <span class="o">-</span> <span class="n">s1</span><span class="p">)</span>
+    <span class="n">comitted</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span> <span class="o">-</span> <span class="n">s2</span><span class="p">)</span>
+
+    <span class="n">s1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">bedgelist</span><span class="p">(</span><span class="n">g1</span><span class="p">))</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">bedgelist</span><span class="p">(</span><span class="n">g2</span><span class="p">))</span>
+    <span class="n">bomitted</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s2</span> <span class="o">-</span> <span class="n">s1</span><span class="p">)</span>
+    <span class="n">bcomitted</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s1</span> <span class="o">-</span> <span class="n">s2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;directed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">omitted</span><span class="p">,</span> <span class="n">comitted</span><span class="p">),</span>
+            <span class="s1">&#39;bidirected&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">bomitted</span><span class="p">,</span> <span class="n">bcomitted</span><span class="p">),</span>
+            <span class="s1">&#39;total&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">omitted</span><span class="o">+</span><span class="n">bomitted</span><span class="p">,</span> <span class="n">comitted</span><span class="o">+</span><span class="n">bcomitted</span><span class="p">)}</span>
+
+
+<span class="k">def</span> <span class="nf">_normed_OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return omission and comission errors for directed and</span>
+
+<span class="sd">    bidirected edges.</span>
+
+<span class="sd">    Omission error is normalized by the number of edges present</span>
+<span class="sd">    in the ground truth. Commision error is normalized by the</span>
+<span class="sd">    number of possible edges minus the number of edges present</span>
+<span class="sd">    in the ground truth.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">    - `g1`: the graph to check</span>
+
+<span class="sd">    - `g2`: the ground truth graph</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">sdiv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mf">1.</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g2</span><span class="p">)</span>
+    <span class="n">gt_DEN</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">g2</span><span class="p">)))</span>  <span class="c1"># number of d  edges in GT</span>
+    <span class="n">gt_BEN</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bedgelist</span><span class="p">(</span><span class="n">g2</span><span class="p">)))</span> <span class="c1"># number of bi edges in GT</span>
+    <span class="n">DEN</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">n</span>       <span class="c1"># all posible directed edges</span>
+    <span class="n">BEN</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="c1"># all possible bidirected edges</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span>
+    <span class="n">nerr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;directed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">gt_DEN</span><span class="p">,</span>
+                         <span class="n">sdiv</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],(</span><span class="n">DEN</span> <span class="o">-</span> <span class="n">gt_DEN</span><span class="p">))),</span>
+            <span class="s1">&#39;bidirected&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">sdiv</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;bidirected&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">gt_BEN</span><span class="p">),</span>
+                           <span class="n">sdiv</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;bidirected&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],(</span><span class="n">BEN</span> <span class="o">-</span> <span class="n">gt_BEN</span><span class="p">))),</span>
+            <span class="s1">&#39;total&#39;</span><span class="p">:</span> <span class="p">((</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;bidirected&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">gt_DEN</span><span class="o">+</span><span class="n">gt_BEN</span><span class="p">),</span>
+                      <span class="n">sdiv</span><span class="p">((</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">err</span><span class="p">[</span><span class="s1">&#39;bidirected&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
+                           <span class="p">(</span><span class="n">DEN</span><span class="o">+</span><span class="n">BEN</span> <span class="o">-</span> <span class="n">gt_BEN</span> <span class="o">-</span> <span class="n">gt_DEN</span><span class="p">)))</span>
+            <span class="p">}</span>
+    <span class="k">return</span> <span class="n">nerr</span>
+
+
+<span class="k">def</span> <span class="nf">OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">_normed_OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">_OCE</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span><span class="n">g2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">err</span>
+
+
+<span class="k">def</span> <span class="nf">clean_leaf_nodes</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">cerror</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;OCE&#39;</span><span class="p">][</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt&#39;</span><span class="p">][</span><span class="s1">&#39;graph&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt&#39;</span><span class="p">][</span><span class="s1">&#39;graph&#39;</span><span class="p">])))</span>
+
+
+<span class="k">def</span> <span class="nf">oerror</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;OCE&#39;</span><span class="p">][</span><span class="s1">&#39;directed&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;gt&#39;</span><span class="p">][</span><span class="s1">&#39;graph&#39;</span><span class="p">])))</span>
+
+
+<span class="k">def</span> <span class="nf">bidirected_no_fork</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">be</span> <span class="o">=</span> <span class="n">bedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">gtranspose</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">be</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">no_parents</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">gtranspose</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">T</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">no_children</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">scc_unreachable</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">bidirected_no_fork</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">no_parents</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">no_children</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+<span class="c1"># unlike functions from traversal package these do no checking</span>
+
+
+<span class="k">def</span> <span class="nf">addanedge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">g</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">delanedge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="n">g</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">addedges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">es</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">es</span><span class="p">:</span>
+        <span class="n">addanedge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">deledges</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">es</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">es</span><span class="p">:</span>
+        <span class="n">delanedge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">isdedgesubset</span><span class="p">(</span><span class="n">g2star</span><span class="p">,</span> <span class="n">g2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    check if g2star directed edges are a subset of those of g2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g2star</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">g2star</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">g2</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+                <span class="c1"># if g2star has a directed edge and g2 does not</span>
+                <span class="k">if</span> <span class="n">g2star</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">h</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">g2</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">h</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">isedgesubset</span><span class="p">(</span><span class="n">g2star</span><span class="p">,</span> <span class="n">g2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    check if all g2star edges are a subset of those of g2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g2star</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">g2star</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">g2</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+                <span class="c1"># Everything is a subset of 3 (both edge types)</span>
+                <span class="k">if</span> <span class="n">g2</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">h</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="c1"># Either they both should have a directed edge, or</span>
+                    <span class="c1"># both should have a bidirected edge</span>
+                    <span class="k">if</span> <span class="n">g2star</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">h</span><span class="p">]</span> <span class="o">!=</span> <span class="n">g2</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">h</span><span class="p">]:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">degree_ring</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a ring graph with `n` nodes and average degree `d`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">expected_degree_graph</span><span class="p">([</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">gn</span> <span class="o">=</span> <span class="n">nx2graph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">addAring</span><span class="p">(</span><span class="n">gn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gn</span>
+
+
+<span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">edgelist</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">udensity</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">bedgelist</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">mean_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">fast_gnp_random_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="o">/</span><span class="n">node_num</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx2graph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">pow_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">powerlaw_sequence</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">exponent</span><span class="o">=</span><span class="n">degree</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">havel_hakimi_graph</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">])</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">NetworkXError</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx2graph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">bp_mean_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">bipartite</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="o">/</span><span class="n">node_num</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nxbp2graph</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="c1"># this function does not work yet - WIP</span>
+<span class="k">def</span> <span class="nf">bp_pow_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">powerlaw_sequence</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">exponent</span><span class="o">=</span><span class="n">degree</span><span class="p">)</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">bipartite</span><span class="o">.</span><span class="n">preferential_attachment_graph</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">],</span> <span class="n">prob</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">NetworkXError</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nxbp2graph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+<span class="k">def</span> <span class="nf">remove_tril_singletons</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ensure that the DAG resulting from this matrix will not have</span>
+
+<span class="sd">    singleton nodes not connected to anything.</span>
+
+<span class="sd">    @param T: lower triangular matrix representing a DAG</span>
+
+<span class="sd">    @type T: numpy array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">neighbors</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">T</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">neighbors</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">idx</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">==</span> <span class="n">v1</span><span class="p">:</span>
+                <span class="n">v1</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">v1</span><span class="p">:</span>
+                <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">v1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">v1</span><span class="p">:</span>
+                <span class="n">T</span><span class="p">[</span><span class="n">v1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">T</span>
+
+<span class="k">def</span> <span class="nf">randomTRIL</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">connected</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a random triangular matrix</span>
+
+<span class="sd">    https://stackoverflow.com/a/56514463</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v1</span> <span class="o">&gt;</span> <span class="n">v2</span><span class="p">:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">v1</span><span class="p">][</span><span class="n">v2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">v1</span> <span class="o">&lt;</span> <span class="n">v2</span><span class="p">:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">v2</span><span class="p">][</span><span class="n">v1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">connected</span><span class="p">:</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">remove_tril_singletons</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mat</span>
+
+
+<span class="k">def</span> <span class="nf">randomDAG</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">connected</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">randomTRIL</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">,</span>
+                                  <span class="n">connected</span><span class="o">=</span><span class="n">connected</span><span class="p">)</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">adjacency_matrix</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">cols</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">gr</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+    <span class="n">gr</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">connected</span><span class="p">:</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">weakly_connected_components</span><span class="p">(</span><span class="n">gr</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">v1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">v2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">component</span><span class="p">))</span>
+                <span class="n">gr</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_directed_acyclic_graph</span><span class="p">(</span><span class="n">gr</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">is_weakly_connected</span><span class="p">(</span><span class="n">gr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gr</span>
+
+
+
+<span class="k">def</span> <span class="nf">shift_labels</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
+    <span class="n">new_g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="n">new_g</span><span class="p">[</span><span class="n">v</span><span class="o">+</span><span class="n">shift</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+            <span class="n">new_g</span><span class="p">[</span><span class="n">v</span><span class="o">+</span><span class="n">shift</span><span class="p">][</span><span class="n">w</span><span class="o">+</span><span class="n">shift</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">w</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">new_g</span>
+
+
+<span class="k">def</span> <span class="nf">shift_list_labels</span><span class="p">(</span><span class="n">glist</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">glist</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="n">glist</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">)):</span>
+        <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shift_labels</span><span class="p">(</span><span class="n">glist</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">shift</span><span class="p">))</span>
+        <span class="n">shift</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">components</span>
+
+
+<span class="k">def</span> <span class="nf">merge_list</span><span class="p">(</span><span class="n">glist</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="k">def</span> <span class="nf">subgraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a subgraph of `g` that consists of `nodes` and their</span>
+<span class="sd">    interconnections.</span>
+
+<span class="sd">    @param g: gunfolds graph</span>
+<span class="sd">    @type g: dictionary</span>
+
+<span class="sd">    @param nodes: integer valued nodes to include</span>
+<span class="sd">    @type nodes: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+    <span class="n">sg</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">sg</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">g</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">node</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">sg</span>
+
+<span class="k">def</span> <span class="nf">gcd4scc</span><span class="p">(</span><span class="n">SCC</span><span class="p">):</span>
+    <span class="c1"># first check if there is at least a single simple loop</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">selfloop</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">SCC</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">SCC</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">graph2nx</span><span class="p">(</span><span class="n">SCC</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ecj</span><span class="o">.</span><span class="n">listgcd</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">simple_cycles</span><span class="p">(</span><span class="n">g</span><span class="p">)])</span>
+
+
+<span class="k">def</span> <span class="nf">ensure_gcd1</span><span class="p">(</span><span class="n">scc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If `scc`&#39;s loop structure is not `gcd=1` pick a random node and</span>
+<span class="sd">    add a self-loop</span>
+
+<span class="sd">    @param scc: a strongly connected component</span>
+<span class="sd">    @type scc: dictionary (gunfolds graph)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">gcd4scc</span><span class="p">(</span><span class="n">scc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">*</span><span class="n">scc</span><span class="p">])</span>
+        <span class="n">scc</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">scc</span>
+
+
+<span class="k">def</span> <span class="nf">update_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update `g` with connections (or nodes) from `g2`. Both must be at `u=1`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">g2</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+<span class="k">def</span> <span class="nf">merge_graphs</span><span class="p">(</span><span class="n">glist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge a list of graphs at `u=1` into a single new graph `g`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">subg</span> <span class="ow">in</span> <span class="n">glist</span><span class="p">:</span>
+        <span class="n">update_graph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">subg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+
+<span class="c1">#this function takes any graph, breaks it into SCCs and make sure each SCC has a gcd of 1</span>
+<span class="k">def</span> <span class="nf">ensure_graph_gcd1</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">graph2nx</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">ensure_gcd1</span><span class="p">(</span><span class="n">subgraph</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">strongly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">merge_graphs</span><span class="p">([</span><span class="n">g</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">gcd1_bp_mean_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">bp_mean_degree_graph</span><span class="p">(</span><span class="n">node_num</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ensure_graph_gcd1</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">ring_sccs</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">num_sccs</span><span class="p">,</span> <span class="n">dens</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_cross_connections</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a random graph with `num_sccs` SCCs, n-nodes each</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dag</span> <span class="o">=</span> <span class="n">randomDAG</span><span class="p">(</span><span class="n">num_sccs</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">dag</span><span class="p">):</span>
+        <span class="n">dag</span> <span class="o">=</span> <span class="n">randomDAG</span><span class="p">(</span><span class="n">num_sccs</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weakly_connected</span><span class="p">(</span><span class="n">dag</span><span class="p">):</span>
+        <span class="n">randTree</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">num_sccs</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">)</span>
+        <span class="n">dag</span> <span class="o">=</span> <span class="n">remove_loop</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">randTree</span><span class="p">),</span> <span class="n">dag</span><span class="o">=</span><span class="n">dag</span><span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">shift_list_labels</span><span class="p">([</span><span class="n">ensure_gcd1</span><span class="p">(</span><span class="n">ringmore</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dens</span> <span class="o">*</span> <span class="n">num</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">num</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_sccs</span><span class="p">)])</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dag</span><span class="p">:</span>
+        <span class="n">v_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">dag</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+            <span class="n">w_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">max_cross_connections</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">v_nodes</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">w_nodes</span><span class="p">)</span>
+                <span class="n">ss</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">a</span><span class="p">][</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">merge_list</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">selfloop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">remove_loop</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">dag</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">lis</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">find_cycle</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">lis</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">edges</span><span class="p">):</span>
+                    <span class="n">G</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">break</span>
+    <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">exception</span><span class="o">.</span><span class="n">NetworkXNoCycle</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_directed_acyclic_graph</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weakly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
