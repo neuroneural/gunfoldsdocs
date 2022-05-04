@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pc &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zickle_py.html">zickle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dbnlatex_py.html">dbnLatex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ecj_py.html">ecj.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grangercasuality_py.html">grangercausality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../linearmodel_py.html">linearmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mytimeout_py.html">my Timeout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../neighborhood_py.html">Neighborhood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pc_py.html">pc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>pc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pc</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">bfutils</span> <span class="k">as</span> <span class="nn">bfu</span>
+<span class="kn">import</span> <span class="nn">graphkit</span> <span class="k">as</span> <span class="nn">gk</span>
+<span class="kn">import</span> <span class="nn">linear_model</span> <span class="k">as</span> <span class="nn">lm</span>
+<span class="kn">import</span> <span class="nn">traversal</span> <span class="k">as</span> <span class="nn">trv</span>
+<span class="kn">import</span> <span class="nn">zickle</span> <span class="k">as</span> <span class="nn">zkl</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">zscore</span><span class="p">,</span> <span class="n">norm</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+
+
+<div class="viewcode-block" id="independent"><a class="viewcode-back" href="../pc_py.html#pc.independent">[docs]</a><span class="k">def</span> <span class="nf">independent</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="n">X</span>  <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">est</span>  <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">est</span><span class="o">.</span><span class="n">pvalues</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pval</span></div>
+
+<div class="viewcode-block" id="kernel"><a class="viewcode-back" href="../pc_py.html#pc.kernel">[docs]</a><span class="k">def</span> <span class="nf">kernel</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.</span>
+    <span class="k">return</span> <span class="o">.</span><span class="mi">5</span></div>
+
+<div class="viewcode-block" id="residuals_"><a class="viewcode-back" href="../pc_py.html#pc.residuals_">[docs]</a><span class="k">def</span> <span class="nf">residuals_</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">pd</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">pdist</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+    <span class="n">PD</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">pd</span><span class="p">)</span>
+    <span class="n">sumsx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">PD</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">x</span>
+    <span class="n">sumsy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">PD</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">y</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">PD</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+    <span class="n">residualsx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">sumsx</span><span class="o">/</span><span class="n">weights</span>
+    <span class="n">residualsy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">sumsy</span><span class="o">/</span><span class="n">weights</span>
+
+    <span class="k">return</span> <span class="n">residualsx</span><span class="p">,</span> <span class="n">residualsy</span></div>
+
+<div class="viewcode-block" id="moment22"><a class="viewcode-back" href="../pc_py.html#pc.moment22">[docs]</a><span class="k">def</span> <span class="nf">moment22</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="fdr"><a class="viewcode-back" href="../pc_py.html#pc.fdr">[docs]</a><span class="k">def</span> <span class="nf">fdr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">pcompare</span> <span class="o">=</span> <span class="p">(</span><span class="n">pvalues</span> <span class="o">&lt;=</span> <span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pcompare</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="n">idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="fdrQ"><a class="viewcode-back" href="../pc_py.html#pc.fdrQ">[docs]</a><span class="k">def</span> <span class="nf">fdrQ</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">):</span>
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span>
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="n">pvalues</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)]</span>
+    <span class="nb">min</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">pvalues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">high</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">low</span>  <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">q</span>    <span class="o">=</span> <span class="n">alpha</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">high</span> <span class="o">-</span> <span class="n">low</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-5</span><span class="p">:</span>
+        <span class="n">midpoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">+</span> <span class="n">low</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">midpoint</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">pvalues</span><span class="p">[</span><span class="n">fdr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">cutoff</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">:</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="n">midpoint</span>
+        <span class="k">elif</span> <span class="n">cutoff</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">:</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="n">midpoint</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">low</span>  <span class="o">=</span> <span class="n">midpoint</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="n">midpoint</span>
+    <span class="k">return</span> <span class="n">q</span></div>
+
+<div class="viewcode-block" id="fdrCutoff"><a class="viewcode-back" href="../pc_py.html#pc.fdrCutoff">[docs]</a><span class="k">def</span> <span class="nf">fdrCutoff</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">):</span>
+    <span class="n">pvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">pvalues</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">fdr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">pvalues</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">pvalues</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="np_fisherZ"><a class="viewcode-back" href="../pc_py.html#pc.np_fisherZ">[docs]</a><span class="k">def</span> <span class="nf">np_fisherZ</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">r</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">z</span>
+    <span class="n">x_</span> <span class="o">=</span> <span class="n">zscore</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">zscore</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">moment22</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="independent_"><a class="viewcode-back" href="../pc_py.html#pc.independent_">[docs]</a><span class="k">def</span> <span class="nf">independent_</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+
+    <span class="c1"># For PC, should not remove the edge for this reason.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">ps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">):</span>
+            <span class="n">x_</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="n">i</span>
+            <span class="n">y_</span> <span class="o">=</span> <span class="n">y</span><span class="o">**</span><span class="n">j</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># r = max(min(r,1),-1) # Tetrad had this</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">np_fisherZ</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+            <span class="c1"># if not np.isnan(p):</span>
+            <span class="n">ps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">fdrCutoff</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">alpha</span></div>
+
+
+<div class="viewcode-block" id="dpc"><a class="viewcode-back" href="../pc_py.html#pc.dpc">[docs]</a><span class="k">def</span> <span class="nf">dpc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># stack the data: first n rows is t-1 slice, the next n are slice t</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]])</span>
+
+    <span class="k">def</span> <span class="nf">tetrad_cind_</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">condset</span><span class="o">=</span><span class="p">[],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">shift</span><span class="o">+</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="k">if</span> <span class="n">condset</span><span class="p">:</span>
+            <span class="n">X</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">condset</span><span class="p">,:]</span>
+            <span class="n">ry</span><span class="p">,</span> <span class="n">rx</span> <span class="o">=</span> <span class="n">residuals_</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ry</span><span class="p">,</span> <span class="n">rx</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">independent_</span><span class="p">(</span><span class="n">ry</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cind_</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">condset</span><span class="o">=</span><span class="p">[],</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">X</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="n">shift</span><span class="o">+</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">condset</span><span class="p">,:]</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">independent</span><span class="p">(</span><span class="n">yd</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cindependent</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">counter</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[],</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">counter</span><span class="p">)]:</span>
+            <span class="k">if</span> <span class="n">cind_</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">condset</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">):</span>
+            <span class="c1">#if tetrad_cind_(x, y, condset=list(S), alpha=pval):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">bindependent</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[],</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cind_</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">condset</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="c1"># return tetrad_cind_(y, x, condset=parents, alpha=pval, shift=n)</span>
+
+    <span class="k">def</span> <span class="nf">prune</span><span class="p">(</span><span class="n">elist</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">mask</span><span class="p">:</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">elist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">gk</span><span class="o">.</span><span class="n">clean_leaf_nodes</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="n">g</span>  <span class="o">=</span> <span class="n">gk</span><span class="o">.</span><span class="n">superclique</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">gtr</span> <span class="o">=</span> <span class="n">gk</span><span class="o">.</span><span class="n">gtranspose</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="n">el</span> <span class="o">=</span> <span class="n">gk</span><span class="o">.</span><span class="n">edgelist</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">counter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">el</span><span class="p">:</span>
+            <span class="n">ppp</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">gtr</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ppp</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cindependent</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">counter</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="n">ppp</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">):</span>
+                    <span class="n">to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">gtr</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">prune</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">to_remove</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+    <span class="n">bel</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">bel</span><span class="p">:</span>
+        <span class="n">ppp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">gtr</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">gtr</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">ppp</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ppp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bindependent</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">parents</span><span class="o">=</span><span class="n">ppp</span><span class="p">,</span> <span class="n">pval</span><span class="o">=</span><span class="n">pval</span><span class="p">):</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-=</span> <span class="mi">2</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="n">gk</span><span class="o">.</span><span class="n">clean_leaf_nodes</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span></div>
+
+
+<span class="c1"># Local Variables:</span>
+<span class="c1"># mode: python</span>
+<span class="c1"># python-indent-offset: 4</span>
+<span class="c1"># End:</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
