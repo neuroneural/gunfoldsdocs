@@ -1,1 +1,0 @@
-pc.py===================.. autofunction:: pc.independent.. autofunction:: pc.kernel.. autofunction:: pc.residuals_.. autofunction:: pc.moment22.. autofunction:: pc.fdr.. autofunction:: pc.fdrQ.. autofunction:: pc.fdrCutoff.. autofunction:: pc.np_fisherZ.. autofunction:: pc.independent_.. autofunction:: pc.dpc

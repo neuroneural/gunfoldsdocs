@@ -1,1 +1,0 @@
-ecj.py===================.. autofunction:: ecj.walk.. autofunction:: ecj.dfs_topsort.. autofunction:: ecj.tr.. autofunction:: ecj.scc.. autofunction:: ecj.cloneBfree.. autofunction:: ecj.gcd.. autofunction:: ecj.listgcd_r.. autofunction:: ecj.listgcd.. autofunction:: ecj.reachable.. autofunction:: ecj.has_unit_cycle
