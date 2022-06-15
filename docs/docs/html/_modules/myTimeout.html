@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>myTimeout &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zickle_py.html">zickle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dbnlatex_py.html">dbnLatex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ecj_py.html">ecj.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grangercasuality_py.html">grangercausality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../linearmodel_py.html">linearmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mytimeout_py.html">my Timeout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../neighborhood_py.html">Neighborhood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pc_py.html">pc.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>myTimeout</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for myTimeout</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<div class="viewcode-block" id="KThread"><a class="viewcode-back" href="../mytimeout_py.html#myTimeout.KThread">[docs]</a><span class="k">class</span> <span class="nc">KThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A subclass of threading.Thread, with a kill() method.</span>
+
+<span class="sd">    Come from:</span>
+<span class="sd">    Kill a thread in Python:</span>
+<span class="sd">    http://mail.python.org/pipermail/python-list/2004-May/260937.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">killed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run_backup</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start the thread.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run_backup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run</span>      <span class="c1"># Force the Thread to install our trace.</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Hacked run function, which installs the trace.&quot;&quot;&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">settrace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">globaltrace</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run_backup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__run_backup</span>
+
+    <span class="k">def</span> <span class="nf">globaltrace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">why</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">why</span> <span class="o">==</span> <span class="s1">&#39;call&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">localtrace</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">localtrace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">why</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">killed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">why</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">localtrace</span>
+
+    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">killed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<span class="k">class</span> <span class="nc">TIMEOUT_EXCEPTION</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;function run timeout&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<div class="viewcode-block" id="timeout"><a class="viewcode-back" href="../mytimeout_py.html#myTimeout.timeout">[docs]</a><span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="n">seconds</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">timeout_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">_new_func</span><span class="p">(</span><span class="n">oldfunc</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">oldfunc_args</span><span class="p">,</span> <span class="n">oldfunc_kwargs</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oldfunc</span><span class="p">(</span><span class="o">*</span><span class="n">oldfunc_args</span><span class="p">,</span> <span class="o">**</span><span class="n">oldfunc_kwargs</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># create new args for _new_func, because we want to get the</span>
+                <span class="c1"># func return val to result list</span>
+                <span class="s1">&#39;oldfunc&#39;</span><span class="p">:</span> <span class="n">func</span><span class="p">,</span>
+                <span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span>
+                <span class="s1">&#39;oldfunc_args&#39;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+                <span class="s1">&#39;oldfunc_kwargs&#39;</span><span class="p">:</span> <span class="n">kwargs</span>
+            <span class="p">}</span>
+
+            <span class="n">thd</span> <span class="o">=</span> <span class="n">KThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_new_func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">new_kwargs</span><span class="p">)</span>
+            <span class="n">thd</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">thd</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+            <span class="n">alive</span> <span class="o">=</span> <span class="n">thd</span><span class="o">.</span><span class="n">isAlive</span><span class="p">()</span>
+            <span class="n">thd</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>  <span class="c1"># kill the child thread</span>
+
+            <span class="k">if</span> <span class="n">alive</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TIMEOUT_EXCEPTION</span><span class="p">(</span>
+                    <span class="s1">&#39;function run too long, timeout </span><span class="si">%d</span><span class="s1"> seconds.&#39;</span> <span class="o">%</span> <span class="n">seconds</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">_</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">_</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span>
+        <span class="k">return</span> <span class="n">_</span>
+
+    <span class="k">return</span> <span class="n">timeout_decorator</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

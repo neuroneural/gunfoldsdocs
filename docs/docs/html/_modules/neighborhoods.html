@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>neighborhoods &mdash; gunfoldsdocs 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gunfoldsdocs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup_gunfolds.html">Setting Up Gunfolds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_py.html">clingo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clingo_raslpy.html">clingo_rasl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graphkit_py.html">graphkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bfutils_py.html">bfutils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calc_process_py.html">calc_process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gtool_py.html">gtool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zickle_py.html">zickle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dbnlatex_py.html">dbnLatex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ecj_py.html">ecj.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grangercasuality_py.html">grangercausality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../linearmodel_py.html">linearmodel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mytimeout_py.html">my Timeout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../neighborhood_py.html">Neighborhood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pc_py.html">pc.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gunfoldsdocs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>neighborhoods</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for neighborhoods</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">clingo</span> <span class="k">as</span> <span class="nn">clg</span>
+<span class="kn">import</span> <span class="nn">graphkit</span> <span class="k">as</span> <span class="nn">gk</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">digits</span>
+<span class="kn">from</span> <span class="nn">progressbar</span> <span class="kn">import</span> <span class="n">ProgressBar</span><span class="p">,</span> <span class="n">Percentage</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">conversions</span> <span class="kn">import</span> <span class="n">num2CG</span><span class="p">,</span> <span class="n">g2vec</span><span class="p">,</span> <span class="n">vec2g</span><span class="p">,</span> <span class="n">g2ian</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">digits</span>
+
+<div class="viewcode-block" id="ncr"><a class="viewcode-back" href="../neighborhood_py.html#neighborhoods.ncr">[docs]</a><span class="k">def</span> <span class="nf">ncr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">numer</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">numer</span><span class="o">//</span><span class="n">denom</span></div>
+
+<div class="viewcode-block" id="num_nATstep"><a class="viewcode-back" href="../neighborhood_py.html#neighborhoods.num_nATstep">[docs]</a><span class="k">def</span> <span class="nf">num_nATstep</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">ncr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ncr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="num_neighbors"><a class="viewcode-back" href="../neighborhood_py.html#neighborhoods.num_neighbors">[docs]</a><span class="k">def</span> <span class="nf">num_neighbors</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="n">ncr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">step</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">+=</span> <span class="n">ncr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">l</span></div>
+
+<div class="viewcode-block" id="hamming_neighbors"><a class="viewcode-back" href="../neighborhood_py.html#neighborhoods.hamming_neighbors">[docs]</a><span class="k">def</span> <span class="nf">hamming_neighbors</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">step</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns an iterator over all neighbors of the binary vector `v` Hamming `step` away from it</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">    - `v`: a binary vector representing a G^u graph</span>
+<span class="sd">    - `step`: Hamming distance from `v` of the vectors to generate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span><span class="n">step</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="find_nearest_reachable"><a class="viewcode-back" href="../neighborhood_py.html#neighborhoods.find_nearest_reachable">[docs]</a><span class="k">def</span> <span class="nf">find_nearest_reachable</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">maxsolutions</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                           <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                           <span class="n">cpath</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                           <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">))</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">clg</span><span class="o">.</span><span class="n">eqclass</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="n">maxsolutions</span><span class="p">,</span> <span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">cpath</span><span class="o">=</span><span class="n">cpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span><span class="p">,</span><span class="n">c</span>
+    <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g2</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">g2vec</span><span class="p">(</span><span class="n">g2</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;neighbors checked @ step &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="n">Percentage</span><span class="p">(),</span> <span class="s1">&#39; &#39;</span><span class="p">]</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">maxval</span><span class="o">=</span><span class="n">num_nATstep</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span><span class="n">step</span><span class="p">),</span> <span class="n">widgets</span><span class="o">=</span><span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">hamming_neighbors</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">vec2g</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">gk</span><span class="o">.</span><span class="n">scc_unreachable</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">clg</span><span class="o">.</span><span class="n">eqclass</span><span class="p">(</span><span class="n">g</span><span class="p">,</span>
+                                <span class="n">capsize</span><span class="o">=</span><span class="n">maxsolutions</span><span class="p">,</span>
+                                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                                <span class="n">cpath</span><span class="o">=</span><span class="n">cpath</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">s</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">step</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">step</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(),</span> <span class="n">num_neighbors</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">step</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span>
+        <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Payal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

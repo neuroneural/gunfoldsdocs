@@ -1,0 +1,1 @@
+dbnLatex===================.. autofunction:: dbn2latex.graph2dict.. autofunction:: dbn2latex.cdbnprint
